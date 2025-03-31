@@ -1,0 +1,40 @@
+﻿@model RegistrationDto
+<form method="post">
+    <div class="card col-md-8 mx-auto mt-4">
+        <div class="card-header bg-success bg-gradient">
+            <div class="text-center">
+                <h2 class="text-white">Registration</h2>
+            </div>
+        </div>
+        <div class=" card-body">
+            <div class="my-3 col-md-10 mx-auto text-danger" asp-validation-summary="ModelOnly"></div>
+            <div class="form-floating my-3 col-md-10 mx-auto">
+                <input asp-for="FullName" class="form-control border-secondary-subtle shadow" placeholder="" />
+                <label asp-for="FullName"></label>
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            <div class="form-floating my-3 col-md-10 mx-auto">
+                <input asp-for="Email" class="form-control border-secondary-subtle shadow" placeholder="" />
+                <label asp-for="Email"></label>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-floating my-3 col-md-10 mx-auto">
+                <input asp-for="Password" class="form-control border-secondary-subtle shadow" placeholder="" />
+                <label asp-for="Password"></label>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-floating my-3 col-md-10 mx-auto">
+                <input asp-for="ConfirmPassword" class="form-control border-secondary-subtle shadow" placeholder="" />
+                <label asp-for="ConfirmPassword"></label>
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <div class="form-check my-3 col-md-10 mx-auto">
+                <input asp-for="IsRemeber" class="form-check-input border-secondary-subtle shadow" placeholder="" />
+                <label asp-for="IsRemeber"></label>
+            </div>
+            <div class="col-md-3 my-3 mx-auto">
+                <input type="submit" value="Register" class="btn btn-primary w-100" />
+            </div>
+        </div>
+    </div>
+</form>
