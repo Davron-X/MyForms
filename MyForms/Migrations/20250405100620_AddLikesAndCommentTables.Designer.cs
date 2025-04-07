@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyForms.Data;
 
@@ -11,9 +12,11 @@ using MyForms.Data;
 namespace MyForms.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250405100620_AddLikesAndCommentTables")]
+    partial class AddLikesAndCommentTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,28 +158,6 @@ namespace MyForms.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("MyForms.Models.AnswerOption", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuestionId");
-
-                    b.ToTable("AnswerOption");
-                });
-
             modelBuilder.Entity("MyForms.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -246,96 +227,6 @@ namespace MyForms.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("MyForms.Models.Comment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("TemplateId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TemplateId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Comments");
-                });
-
-            modelBuilder.Entity("MyForms.Models.Like", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("TemplateId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("TemplateId", "UserId")
-                        .IsUnique();
-
-                    b.ToTable("Likes");
-                });
-
-            modelBuilder.Entity("MyForms.Models.Question", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("OrderIndex")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("ShowInTable")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("TemplateId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TemplateId");
-
-                    b.ToTable("Questions");
-                });
-
             modelBuilder.Entity("MyForms.Models.Tag", b =>
                 {
                     b.Property<int>("Id")
@@ -392,6 +283,96 @@ namespace MyForms.Migrations
                     b.HasIndex("TopicId");
 
                     b.ToTable("Templates");
+                });
+
+            modelBuilder.Entity("MyForms.Models.TemplateComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TemplateId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TemplateId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TemplateComments");
+                });
+
+            modelBuilder.Entity("MyForms.Models.TemplateLike", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("TemplateId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("TemplateId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("TemplateLikes");
+                });
+
+            modelBuilder.Entity("MyForms.Models.TemplateQuestion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ShowInTable")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("TemplateId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TemplateId");
+
+                    b.ToTable("TemplateQuestions");
                 });
 
             modelBuilder.Entity("MyForms.Models.TemplateTag", b =>
@@ -528,66 +509,6 @@ namespace MyForms.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MyForms.Models.AnswerOption", b =>
-                {
-                    b.HasOne("MyForms.Models.Question", "Question")
-                        .WithMany("AnswerOptions")
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Question");
-                });
-
-            modelBuilder.Entity("MyForms.Models.Comment", b =>
-                {
-                    b.HasOne("MyForms.Models.Template", "Template")
-                        .WithMany("Comments")
-                        .HasForeignKey("TemplateId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MyForms.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany("Comments")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("Template");
-                });
-
-            modelBuilder.Entity("MyForms.Models.Like", b =>
-                {
-                    b.HasOne("MyForms.Models.Template", "Template")
-                        .WithMany("Likes")
-                        .HasForeignKey("TemplateId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MyForms.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany("Likes")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("Template");
-                });
-
-            modelBuilder.Entity("MyForms.Models.Question", b =>
-                {
-                    b.HasOne("MyForms.Models.Template", "Template")
-                        .WithMany("Questions")
-                        .HasForeignKey("TemplateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Template");
-                });
-
             modelBuilder.Entity("MyForms.Models.Template", b =>
                 {
                     b.HasOne("MyForms.Models.ApplicationUser", "ApplicationUser")
@@ -605,6 +526,55 @@ namespace MyForms.Migrations
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("Topic");
+                });
+
+            modelBuilder.Entity("MyForms.Models.TemplateComment", b =>
+                {
+                    b.HasOne("MyForms.Models.Template", "Template")
+                        .WithMany("Comments")
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MyForms.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Template");
+                });
+
+            modelBuilder.Entity("MyForms.Models.TemplateLike", b =>
+                {
+                    b.HasOne("MyForms.Models.Template", "Template")
+                        .WithMany("Likes")
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MyForms.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("Likes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Template");
+                });
+
+            modelBuilder.Entity("MyForms.Models.TemplateQuestion", b =>
+                {
+                    b.HasOne("MyForms.Models.Template", "Template")
+                        .WithMany("Questions")
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Template");
                 });
 
             modelBuilder.Entity("MyForms.Models.TemplateTag", b =>
@@ -652,11 +622,6 @@ namespace MyForms.Migrations
                     b.Navigation("Likes");
 
                     b.Navigation("TemplateUsers");
-                });
-
-            modelBuilder.Entity("MyForms.Models.Question", b =>
-                {
-                    b.Navigation("AnswerOptions");
                 });
 
             modelBuilder.Entity("MyForms.Models.Tag", b =>

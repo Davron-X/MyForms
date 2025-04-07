@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyForms.Data;
 using MyForms.Models;
+using MyForms.Services;
+using MyForms.Services.Interfaces;
 
 namespace MyForms
 {
@@ -10,6 +12,7 @@ namespace MyForms
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddScoped<ITemplateService, TemplateService>();
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<ApplicationDbContext>(option =>
             {

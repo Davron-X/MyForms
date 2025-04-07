@@ -1,0 +1,77 @@
+﻿@model TemplateDetailsVM
+@{
+    Layout = "_DetailsLayout";
+}
+<div class="card mt-4 ">
+    <div class="card-header">
+        <h3>@Model.Template.Title</h3>
+    </div>
+    <div class="card-body">
+        <h6>Author: @Model.Template.ApplicationUser?.FullName</h6>
+        <p>Created At: @Model.Template.CreatedAt.ToShortDateString()</p>
+            <p>
+            Is Private: @Model.Template.IsPrivate
+        </p>
+        <div>
+            Topic: @Model.Template.Topic?.Name
+        </div>
+          
+        <div class="d-flex gap-2 ">
+            <h6 class="m-0">Tags:</h6>
+            @foreach (var tag in Model.Template.TemplateTags)
+            {
+                <span class="badge bg-secondary m-0">@tag.Tag?.Name</span>
+            }
+        </div>
+    </div>
+    <div class="card-footer">
+        <div>
+            @Html.Raw(Model.Template.Description)
+        </div>
+    </div>
+</div>
+<div class="card mt-4">
+    <div class="card-header">
+        <h5>Questions</h5>
+    </div>
+    <div class="card-body">
+        @foreach (var question in Model.Template.Questions)
+        {
+            <div class="mb-3 border border-secondary rounded-2 p-2">
+                <label class="form-label fw-bold">@question.Text</label>
+                @if (question?.Description is not null)
+                {
+                    <p class="text-muted small">@question?.Description</p>
+                }
+                <!-- Плейсхолдеры вместо полей ввода -->
+                <div class=" p-2 rounded">
+                    @switch (question?.Type)
+                    {
+                        case QuestionType.SingleLineText:
+                            <small>[Текстовое поле]</small>
+                            break;
+                        case QuestionType.Numeric:
+                            <small>[Числовое поле]</small>
+                            break;
+                        case QuestionType.Checkbox:
+                            @foreach (var answer in question.AnswerOptions)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" disabled>
+                                    <label class="form-check-label">@answer.Text</label>
+                                </div>
+                            }
+                            break;
+                    }
+                </div>
+            </div>
+        }
+    </div>
+    <div class="card-footer p-4">
+        <partial name="_LikePartial" model="@Model.LikeVM" />
+    </div>
+</div>
+<div >
+    <partial name="_CommentsPartial"model="@Model.CommentsVM" />
+</div>
+
