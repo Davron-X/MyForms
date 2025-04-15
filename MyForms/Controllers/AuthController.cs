@@ -37,6 +37,7 @@ namespace MyForms.Controllers
             IdentityResult identityResult= await userManager.CreateAsync(applicationUser,registrationDto.Password);
             if (identityResult.Succeeded)
             {
+                await userManager.AddToRoleAsync(applicationUser, AppConsts.UserRole);
                 await signInManager.SignInAsync(applicationUser, registrationDto.IsRemeber);                
                 return RedirectToAction("Index", "Home");
             }
@@ -62,6 +63,11 @@ namespace MyForms.Controllers
             if (user is null || !await userManager.CheckPasswordAsync(user,loginDto.Password))
             {
                 ModelState.AddModelError("", "Email or password is incorrect");
+                return View();
+            }
+            if(user.LockoutEnd>DateTime.UtcNow)
+            {
+                TempData["Error"] = "Your account is blocked";
                 return View();
             }
             await signInManager.SignInAsync(user,  loginDto.IsRemeber);

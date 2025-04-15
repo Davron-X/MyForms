@@ -8,8 +8,7 @@ namespace MyForms.Models
         public string Text { get; set; } = string.Empty;
         public int TemplateId { get; set; }
         public Template? Template { get; set; }
-        public string UserId { get; set; } = string.Empty;
-        [ForeignKey("UserId")]
+        public string UserId { get; set; } = string.Empty; 
         public ApplicationUser? ApplicationUser { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }

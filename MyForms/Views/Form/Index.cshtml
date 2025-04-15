@@ -1,0 +1,72 @@
+﻿@model IList<FormVM>
+
+<form method="post">
+    <div class="p-4">
+
+        @if (Model != null && Model.Count() > 0)
+        {
+            <div class="row">
+                <h1 class="text-primary">Forms List</h1>
+            </div>
+            <div class="m-2">
+                <button type="submit" asp-action="Remove" asp-controller="Form" class="btn btn-outline-danger">
+                    <i class="bi bi-trash-fill"></i>
+                </button>
+            </div>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" class="form-check-input border-2 border-info" id="check-all" /></th>
+                        <th>
+                            Template Title
+                        </th>
+                        <th>
+                            Filled By
+                        </th>
+                        <th>
+                            Data Created
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        <tr class="clickable-row" data-href="@Url.Action("Overview", "Form", new { formId = Model[i].Form?.Id })">
+                            <td>
+                                <input type="checkbox" asp-for="@Model[i].IsChecked" class="form-check-input border-2 border-info" />
+                                <input asp-for="@Model[i].Form.Id" hidden />
+                            </td>
+                            <td>@Model[i].Form?.Template?.Title</td>
+                            <td>@Model[i].Form?.ApplicationUser?.FullName</td>
+                            <td>@Model[i].Form?.CreatedAt</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <h1 class="text-primary">No forms</h1>
+        }
+    </div>
+
+</form>
+<script>
+    const rows=document.querySelectorAll(".clickable-row");
+    rows.forEach(row=>{
+        row.style.cursor="pointer";
+        row.addEventListener("click",(e)=>{
+            if(e.target.nodeName!="INPUT"){
+                window.location=row.dataset.href;
+            }
+        });
+    });
+    const checkAll=document.getElementById("check-all");
+        checkAll.addEventListener("change",()=>
+        {
+            const checkBoxes=document.querySelectorAll(".clickable-row [type=checkbox]");
+            checkBoxes.forEach(checkBox=>{
+                checkBox.checked=checkAll.checked;
+            });
+    });
+</script>

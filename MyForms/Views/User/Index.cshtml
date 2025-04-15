@@ -1,0 +1,102 @@
+﻿@model IList<ApplicationUserVM>
+<form method="post">
+    <div class="my-4">
+        <div>
+            <h2 class="text-primary">User List</h2>
+        </div>
+        <div class="row my-3">
+            <div class="col-md-8 d-flex gap-3">
+                <button type="submit" asp-action="BlockUsers" class="btn btn-outline-warning">
+                    block
+                    <i class="bi bi-lock-fill"></i>
+                </button>
+                <button type="submit" asp-action="UnblockUsers" class="btn btn-outline-primary">
+                    <i class="bi bi-unlock-fill"></i>
+                </button>
+                <button type="submit" asp-action="RemoveUsers" class="btn btn-outline-danger">
+                    <i class="bi bi-trash-fill"></i>
+                </button>
+                <button type="submit" asp-action="AddToAdmins" class="btn btn-outline-danger">
+                    Add to Admins
+                    <i class="bi bi-person-fill-up "></i>
+                </button>
+                <button type="submit" asp-action="RemoveAdminRoles" class="btn btn-outline-danger">
+                    Remove admin role
+                    <i class="bi bi-person-fill-down "></i>
+                </button>
+            </div>
+        </div>
+        <div>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" class="form-check-input border-2 border-info" id="check-all" /></th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Roles</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i=0;i<Model.Count;i++)
+                    {
+                        <tr class="clckable-row" style="cursor:pointer">
+                            <td>
+                                <input type="checkbox" asp-for="@Model[i].IsSelected" class="form-check-input border-2 border-info check-input" />
+                                <input hidden asp-for="@Model[i].Id" />
+                                <input hidden asp-for="@Model[i].IsBlocked" />
+                            </td>
+                            <td>@Model[i].FullName</td>
+                            <td>@Model[i].Email</td>
+                            <td>
+                                @for (int j =0;j<Model[i].Roles.Count();j++)
+                                {
+                                    if (@Model[i].Roles[j]==AppConsts.AdminRole){
+                                        <span class="badge bg-danger">@Model[i].Roles[j]</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-info">@Model[i].Roles[j]</span>
+                                    }
+                                    <input hidden asp-for="@Model[i].Roles[j]" />
+                                }
+                            </td>
+                            <td>
+                                @if (@Model[i].IsBlocked){
+                                    <span class="badge bg-danger">Blocked</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</form>
+<script>
+    document.addEventListener("DOMContentLoaded",()=>{
+            document.addEventListener("DOMContentLoaded",()=>{
+            const checkAll=document.getElementById("check-all");
+            checkAll.addEventListener("change",()=>{
+                document.querySelectorAll(`tbody tr td .check-input `).forEach(input=>{
+                    input.checked=checkAll.checked;
+                });
+            });
+
+            document.querySelectorAll("tbody").addEventListener("click",(e)=>{
+                if(e.target.closest("tr"))
+                {
+                    let tr  = e.target.closest("tr");
+                    const checkbox= tr.querySelector(`td .check-input`);
+                    checkbox.checked=!checkbox.checked;
+                }
+            });
+        });
+    })
+   
+</script>

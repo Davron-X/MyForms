@@ -1,0 +1,74 @@
+﻿@using MyForms.Models.VM.TemplateVMs
+@model TemplateSettingVM
+<div class="card my-4">
+    <input hidden asp-for="Template.Id" id="template-id" />
+    <div class="card-body">
+        <div asp-validation-summary="ModelOnly" class="text-danger col-md-8 mx-auto"></div>
+        <div class="form-floating my-3 col-md-8 mx-auto">
+            <input asp-for="Template.Title" placeholder="" class="form-control" />
+            <label asp-for="Template.Title"></label>
+            <span asp-validation-for="Template.Title" class="text-danger"></span>
+        </div>
+        <div class=" my-3 col-md-8 mx-auto">
+            <label asp-for="Template.Topic" class="form-label"></label>
+            <select class="form-select" asp-for="Template.TopicId" asp-items="Model.Topics">
+            </select>
+        </div>
+
+        <div class="form-floating my-3 col-md-8 mx-auto">
+            <textarea asp-for="Template.Description" placeholder="" class="form-control" rows="3" style="height:80px">                </textarea>
+            <label asp-for="Template.Description"></label>
+            <span asp-validation-for="Template.Description" class="text-danger"></span>
+        </div>
+        <div class="my-3 col-md-8 mx-auto">
+            <label asp-for="Template.Image" class="form-label"></label>
+            <input asp-for="Template.Image" type="file" class="form-control">
+        </div>
+
+
+        <div class="my-3 col-md-8 mx-auto">
+            <div class="input-group">
+                <div class="input-group-text">#</div>
+                <input type="text" id="tag-input" class="form-control" placeholder="Tags">
+                <button id="add-tag" class="btn btn-success">
+                    <i class="bi bi-plus-square"></i>
+                </button>
+            </div>
+            <div id="tag-container" class="mt-2 d-flex gap-2 flex-wrap">
+                @if(Model.Template!=null && Model.Template.TemplateTags.Any()){
+                    @foreach (var item in Model.Template.TemplateTags)
+                    {
+                        <div class="tag-item ">
+                            <span class="badge bg-secondary rounded-pill">
+                                @item.Tag.Name
+                                <button type="button" class="btn-close"></button>
+                            </span>
+                            <input hidden name="tagNames" value="@item.Tag.Name" />
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="form-check my-3 col-md-8 mx-md-auto">
+            <label for="is-private-check">Is Private</label>
+            <input id="is-private-check" asp-for="Template.IsPrivate" class="form-check-input" />
+        </div>
+        <div id="add-email" @(Model.Template != null && Model.Template.IsPrivate ? "" : "hidden") class="my-3 col-md-8 mx-auto">
+            <div class="input-group">
+                <input type="email" id="email-input" class="form-control" placeholder="enter email" />
+                <button id="add-email-btn" class="btn btn-success">
+                    <i class="bi bi-plus-square"></i>
+                </button>
+            </div>
+            <div id="email-error" class="alert alert-danger mt-2 d-none" role="alert">
+                Пользователь с таким email не найден.
+            </div>
+            <div id="email-container" class="mt-2 d-flex gap-2">
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/template-settings.js">
+   
+</script>

@@ -17,5 +17,6 @@ namespace MyForms.Models
         public string? Description { get; set; }
         public bool ShowInTable { get; set; }
         public List<AnswerOption> AnswerOptions { get; set; } = new List<AnswerOption>();
+        public List<FormAnswer> FormAnswers { get; set; } = new List<FormAnswer>();
     }
 }

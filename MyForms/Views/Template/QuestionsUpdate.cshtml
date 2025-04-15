@@ -1,0 +1,17 @@
+﻿@using MyForms.Models.VM.TemplateVMs
+@model TemplateQuestionUpdateVM
+
+    <partial name="_TemplateTabsPartial" model="@Model.TemplateId" />
+
+<form method="post">
+    <div class="my-4 container col-md-8 mx-auto">
+
+        <input asp-for="TemplateId" type="hidden" />
+        <div>
+            <partial name="_QuestionManagerPartial" model="@Model.Questions" />
+        </div>
+        <div class="col-3 mx-auto my-4">
+            <input type="submit" value="Update" class="w-100 btn btn-primary" />
+        </div>
+    </div>
+</form>

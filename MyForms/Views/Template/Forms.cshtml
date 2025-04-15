@@ -1,0 +1,31 @@
+﻿@model Template
+<partial name="_TemplateTabsPartial" model="Model.Id"/>
+<div class="col-md-8 mx-auto">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Filled by</th>
+                <th>Filled at</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var form in Model.Forms)
+            {
+                <tr class="clickable-row" data-href="@Url.Action("Overview","Form",new {formId=form.Id})" style="cursor:pointer" >
+                    <td>@form.ApplicationUser?.FullName</td>
+                    <td>@form.CreatedAt</td>
+                </tr>
+            }
+        </tbody>
+    </table>    
+</div>
+<script >
+    document.addEventListener("DOMContentLoaded",()=>{
+        document.querySelector("tbody").addEventListener("click",(e)=>{
+            const row= e.target.closest(".clickable-row");
+            if(row){
+                window.location=row.dataset.href;
+            }
+        })
+    });
+</script>

@@ -1,4 +1,89 @@
-﻿@{
-    Layout = "_DetailsLayout";
-}
-<h2>Update</h2>
+﻿@using MyForms.Models.VM.TemplateVMs
+@model TemplateUpdateVM
+<partial name="_TemplateTabsPartial" model="@Model.TemplateSettingVM.Template.Id" />
+
+<form method="post">
+    <div class="my-4 container col-md-8 mx-auto">
+
+        <div class="my-4">
+        <partial name="_TemplateSettingsPartial" model="@Model.TemplateSettingVM" />
+        @if (Model.TemplateSettingVM.Template.TemplateUsers.Any())
+        {
+            <div class="card  users-container" @(Model.TemplateSettingVM.Template.IsPrivate ? "" : "hidden")>
+             <div class="card-header">
+                    <h4 class="text-primary">Allowed users</h4>
+                </div>
+                    <div class="card-body" >
+                        <div class="col-2 mx-auto my-3">
+                            <button id="delete-users-btn" class="btn btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th width="10%"><input id="select-users" type="checkbox" class="form-check-input border-info border-2" /></th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var templateUser in Model.TemplateSettingVM!.Template.TemplateUsers)
+                                {
+                                    <tr>
+                                        <td><input type="checkbox" class="form-check-input border-info border-2" /></td>
+                                        <td>@templateUser?.ApplicationUser?.FullName</td>
+                                        <td>
+                                            @templateUser?.ApplicationUser?.Email
+                                            <input name="emails" value="@templateUser?.ApplicationUser?.Email" hidden />
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+               
+            </div>
+        }
+        <div class="my-4 col-md-3 mx-auto">
+            <input type="submit" value="Update" class="w-100 btn btn-primary" />
+        </div>
+    </div>
+    </div>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded",()=>{
+        const selectAll=document.getElementById("select-users");
+        const deleteUsersBtn=document.getElementById("delete-users-btn");
+        const isPrivateInput=document.getElementById("is-private-check");
+        const usersContainer=document.querySelector(".users-container");
+        selectAll.addEventListener("change",()=>{
+        document.querySelectorAll(`tbody tr [type="checkbox"]`).forEach(input=>{
+            console.log(input);
+            input.checked=selectAll.checked;
+            });       
+        });
+
+        deleteUsersBtn.addEventListener("click",(e)=>{
+        e.preventDefault();
+        console.log("clic");
+            document.querySelectorAll(`tbody tr [type="checkbox"]`).forEach(checkbox=>{
+            if(checkbox.checked){
+                checkbox.closest("tr").remove();
+            }
+        })
+    });
+        isPrivateInput.addEventListener("change",(e)=>{
+            if(isPrivateInput.checked){
+                usersContainer.hidden=false;
+            }
+            else{
+                usersContainer.hidden=true;
+            }
+        })
+
+
+})
+    
+</script>

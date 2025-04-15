@@ -1,0 +1,153 @@
+﻿@model IList<Question>
+<div class="card border-0 my-4">
+    <div class="card-header border-bottom sticky-top py-2 bg-dark shadow-sm">
+        <div class="row justify-content-center g-2">
+            <div class=" col-auto">
+                <button id="delete-question" class="btn btn-outline-danger">
+                    <i class="bi bi-trash3-fill"></i>
+                </button>
+            </div>
+            <div class=" col-auto">
+                <button id="create-question" class="btn btn-outline-success">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            </div>
+            <div class=" col-auto">
+                <button id="select-all" class="btn btn-outline-primary">
+                    Select All <i class="bi bi-check2-all"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body ">
+        <div id="question-container">
+            @if(Model!=null){
+                for (int i = 0; i < Model.Count; i++)
+                {
+                    <div data-id="@i" class="question-item border border-secondary border-3  p-3 rounded-3 my-3">
+                        <input name="Questions[@i].TemplateId" asp-for="@Model[i].TemplateId" hidden />
+                        <input name="Questions[@i].Id" asp-for="@Model[i].Id" hidden />
+                        <div class="text-start col-1 check-wrap">
+                            <input type="checkbox" class="form-check-input border-2 border-primary-subtle " />
+                        </div>
+                        <div class="row my-2 ">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input name="Questions[@i].Text" placeholder="" asp-for="@Model[i].Text"
+                                    class="form-control border-primary border-2  " />
+                                    <label class="text-muted fw-medium">Question Text</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 ">
+                                <select name="Questions[@i].Type" asp-for="@Model[i].Type" class="form-select border-primary border-2 py-3 question-type"
+                                asp-items="@Html.GetEnumSelectList<QuestionType>()">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row  mt-3 ">
+                            <div class="col-md-4">
+                                <div class="form-check form-switch">
+                                    <label class="form-check-label fw-medium">Add Description</label>
+                                    <input type="checkbox" @(Model[i].Description ==null?"":"checked") class="form-check-input description-check">
+                                </div>
+                                <div class="form-check form-switch">
+                                    <label class="form-check-label fw-medium">Show in table</label>
+                                    <input name="Questions[@i].ShowInTable" asp-for="@Model[i].ShowInTable" value="true" type="checkbox" class="form-check-input">
+                                </div>
+                            </div>
+                            @if (Model[i].Description is not null)
+                            {
+                                <div class="col-md-8  description-container">
+                                    <textarea name="Questions[@i].Description" asp-for="@Model[i].Description" class="form-control border-secondary border-2 fs-5"
+                                    rows="3" placeholder="Enter description..."></textarea>
+                                </div>
+                            }
+                        </div>
+                        <div class="mt-3 answer-container">
+                            <div>
+                                @switch(Model[i].Type)
+                                {
+                                    case QuestionType.MultiLineText:
+                                    <label class="form-label fw-semibold">Answer</label>
+                                    <textarea class="form-control" rows="3" disabled></textarea>
+                                    break;
+
+                                    case QuestionType.SingleLineText:
+                                        <label class="form-label fw-semibold">Answer</label>
+                                        <input type="text" class="form-control" disabled/>
+                                        break;
+                                    case QuestionType.Numeric:
+                                        <label class="form-label fw-semibold">Answer</label>
+                                        <input type="number" class="form-control" disabled />
+                                        break;
+                                    case QuestionType.Checkbox:
+                                        <label class="form-label fw-semibold">Options</label>
+                                        <div class="checkboxes-container mb-2">
+                                           @for (int j = 0; j < Model[i].AnswerOptions.Count; j++)
+                                            {
+                                                <div class="d-flex align-items-center gap-2  p-2 rounded option-container">
+                                                    <input type="checkbox" disabled="" class="form-check-input me-2">
+                                                    <input name="Questions[@i].AnswerOptions[@j].Id" value="@Model[i].AnswerOptions[j].Id" class="option-input" hidden />
+                                                    <input name="Questions[@i].AnswerOptions[@j].QuestionId" value="@Model[i].AnswerOptions[j].QuestionId" class="option-input" hidden />
+                                                    <input name="Questions[@i].AnswerOptions[@j].Text" asp-for="@Model[i].AnswerOptions[j].Text" class="form-control option-input" placeholder="Option text">
+                                                    <button type="button" class="btn btn-sm btn-outline-danger ms-auto close-option">
+                                                        <i class="bi bi-x"></i>
+                                                    </button>
+                                                </div>
+                                            }
+                                        </div>
+                                        <button class="btn btn-sm btn-outline-primary add-option">
+                                            <i class="bi bi-plus-circle"></i> Add Option
+                                        </button>
+                                        break;
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            <template id="question-template">
+                <div class="question-item border border-secondary border-3  p-3 rounded-3 my-3">
+                    <div class="text-start check-wrap">
+                        <input type="checkbox" class="form-check-input border-2 border-primary-subtle " />
+                    </div>
+                    <div class="row my-2 ">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input placeholder="" name="Questions[{{index}}].Text"
+                                       class="form-control border-primary border-2  " />
+                                <label class="text-muted fw-medium">Question Text</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 ">
+                            <select name="Questions[{{index}}].Type" class="form-select border-primary border-2 py-3 question-type"
+                                    asp-items="@Html.GetEnumSelectList<QuestionType>()">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row  mt-3 ">
+                        <div class="col-md-4">
+                            <div class="form-check form-switch">
+                                <label class="form-check-label fw-medium">Add Description</label>
+                                <input type="checkbox" class="form-check-input description-check">
+                            </div>
+                            <div class="form-check form-switch">
+                                <label class="form-check-label fw-medium">Show in table</label>
+                                <input name="Questions[{{index}}].ShowInTable" value="true" type="checkbox" class="form-check-input">
+                            </div>
+                        </div>
+                        <div class="col-md-8 d-none description-container">
+                            <textarea name="Questions[{{index}}].Description" class="form-control border-secondary border-2 fs-5"
+                                      rows="3" placeholder="Enter description..."></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-3 answer-container">
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</div>
+<script src="~/js/questions-manager.js">
+  
+</script>

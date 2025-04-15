@@ -1,54 +1,82 @@
-﻿@model IEnumerable<Template>
-<div class="p-4">
-    <div class="row">
-        <div class="col-md-3 offset-md-9 text-end">
-            <a class="btn btn-primary w-75" asp-action="Create" asp-controller="Template">Create new</a>
-        </div>
-    </div>
-@if(Model!=null&&Model.Count()>0){    
+﻿@model IList<TemplateVM>
+<form method="post">
+    <div class="p-4">
         <div class="row">
-            <h1 class="text-primary">Templates List</h1>
+            <div class="col-md-3 offset-md-9 text-end">
+                <a class="btn btn-primary w-75" asp-action="Create" asp-controller="Template">Create new</a>
+            </div>
         </div>
-        <table class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th>
-                        Title
-                    </th>
-                    <th>
-                        Topic
-                    </th>
-                    <th>
-                        Is Private
-                    </th>
-                    <th>
-                        Data Created 
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var template in Model)
-                {
-                    <tr class="clickable-row" data-href="@Url.Action("Details", "Template", new { templateId =template.Id})">
-                        <td>@template.Title</td>
-                        <td>@template.Topic?.Name</td>
-                        <td>@template.IsPrivate</td>
-                        <td>@template.CreatedAt</td>
+        @if (Model != null && Model.Count() > 0)
+        {
+            <div class="row">
+                <h1 class="text-primary">Templates List</h1>
+            </div>
+            <div class="m-2">
+                <button type="submit" asp-action="Remove" asp-controller="Template" class="btn btn-outline-danger">
+                    <i class="bi bi-trash-fill"></i>
+                </button>
+            </div>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" class="form-check-input border-2 border-info" id="check-all" /></th>
+                        <th>
+                            Title
+                        </th>
+                        <th>
+                            Topic
+                        </th>
+                        <th>
+                            Is Private
+                        </th>
+                        <th>
+                            Data Created
+                        </th>
                     </tr>
-                }
-            </tbody>
-        </table>
-}
-else{
-    <h1 class="text-primary">No templates</h1>
-}
-</div>
+                </thead>
+                <tbody>
+                    @for (int i=0;i<Model.Count;i++)
+                    {
+                        <tr class="clickable-row" data-href="@Url.Action("Details", "Template", new { templateId = Model[i].Template?.Id })">
+                            <td>
+                                <input type="checkbox" asp-for="@Model[i].IsChecked" class="form-check-input border-2 border-info" />
+                                <input asp-for="@Model[i].Template.Id" hidden />
+                            </td>
+                            <td>@Model[i].Template?.Title</td>
+                            <td>@Model[i].Template?.Topic?.Name</td>
+                            <td>@Model[i].Template?.IsPrivate</td>
+                            <td>@Model[i].Template?.CreatedAt</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <h1 class="text-primary">No templates</h1>
+        }
+    </div>
+
+</form>
+
 <script>
     const rows=document.querySelectorAll(".clickable-row");
     rows.forEach(row=>{
         row.style.cursor="pointer";
-        row.addEventListener("click",()=>{
-            window.location=row.dataset.href;
+        row.addEventListener("click",(e)=>{
+            if(e.target.nodeName!="INPUT"){
+                window.location=row.dataset.href;
+            }
         });
     });
+
+    const checkAll=document.getElementById("check-all");
+        checkAll.addEventListener("change",()=>
+        {
+            const checkBoxes=document.querySelectorAll(".clickable-row [type=checkbox]");
+            checkBoxes.forEach(checkBox=>{
+                checkBox.checked=checkAll.checked;
+            });
+    });
+   
 </script>

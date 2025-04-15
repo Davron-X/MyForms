@@ -174,7 +174,7 @@ namespace MyForms.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("AnswerOption");
+                    b.ToTable("AnswerOptions");
                 });
 
             modelBuilder.Entity("MyForms.Models.ApplicationUser", b =>
@@ -277,6 +277,60 @@ namespace MyForms.Migrations
                     b.ToTable("Comments");
                 });
 
+            modelBuilder.Entity("MyForms.Models.Form", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FilledBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("TemplateId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FilledBy");
+
+                    b.HasIndex("TemplateId");
+
+                    b.ToTable("Forms");
+                });
+
+            modelBuilder.Entity("MyForms.Models.FormAnswer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AnswerText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("FormId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FormId");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("FormAnswers");
+                });
+
             modelBuilder.Entity("MyForms.Models.Like", b =>
                 {
                     b.Property<int>("Id")
@@ -365,7 +419,6 @@ namespace MyForms.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("CreatedById")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
@@ -544,7 +597,7 @@ namespace MyForms.Migrations
                     b.HasOne("MyForms.Models.Template", "Template")
                         .WithMany("Comments")
                         .HasForeignKey("TemplateId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MyForms.Models.ApplicationUser", "ApplicationUser")
@@ -558,12 +611,50 @@ namespace MyForms.Migrations
                     b.Navigation("Template");
                 });
 
+            modelBuilder.Entity("MyForms.Models.Form", b =>
+                {
+                    b.HasOne("MyForms.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("Forms")
+                        .HasForeignKey("FilledBy")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyForms.Models.Template", "Template")
+                        .WithMany("Forms")
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Template");
+                });
+
+            modelBuilder.Entity("MyForms.Models.FormAnswer", b =>
+                {
+                    b.HasOne("MyForms.Models.Form", "Form")
+                        .WithMany("FormAnswers")
+                        .HasForeignKey("FormId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MyForms.Models.Question", "Question")
+                        .WithMany("FormAnswers")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Form");
+
+                    b.Navigation("Question");
+                });
+
             modelBuilder.Entity("MyForms.Models.Like", b =>
                 {
                     b.HasOne("MyForms.Models.Template", "Template")
                         .WithMany("Likes")
                         .HasForeignKey("TemplateId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MyForms.Models.ApplicationUser", "ApplicationUser")
@@ -591,10 +682,9 @@ namespace MyForms.Migrations
             modelBuilder.Entity("MyForms.Models.Template", b =>
                 {
                     b.HasOne("MyForms.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany()
+                        .WithMany("Templates")
                         .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("MyForms.Models.Topic", "Topic")
                         .WithMany()
@@ -631,7 +721,7 @@ namespace MyForms.Migrations
                     b.HasOne("MyForms.Models.Template", "Template")
                         .WithMany("TemplateUsers")
                         .HasForeignKey("TemplateId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MyForms.Models.ApplicationUser", "ApplicationUser")
@@ -649,14 +739,25 @@ namespace MyForms.Migrations
                 {
                     b.Navigation("Comments");
 
+                    b.Navigation("Forms");
+
                     b.Navigation("Likes");
 
                     b.Navigation("TemplateUsers");
+
+                    b.Navigation("Templates");
+                });
+
+            modelBuilder.Entity("MyForms.Models.Form", b =>
+                {
+                    b.Navigation("FormAnswers");
                 });
 
             modelBuilder.Entity("MyForms.Models.Question", b =>
                 {
                     b.Navigation("AnswerOptions");
+
+                    b.Navigation("FormAnswers");
                 });
 
             modelBuilder.Entity("MyForms.Models.Tag", b =>
@@ -667,6 +768,8 @@ namespace MyForms.Migrations
             modelBuilder.Entity("MyForms.Models.Template", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Forms");
 
                     b.Navigation("Likes");
 
