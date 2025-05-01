@@ -16,70 +16,39 @@ namespace MyForms.Controllers
     [Authorize]
     public class TemplateController : Controller
     {
+
         private readonly ApplicationDbContext db;
+
         private readonly ITemplateService templateService;
+
         public TemplateController(ApplicationDbContext db, ITemplateService templateService)
         {
             this.db = db;
             this.templateService = templateService;
         }
-        [AllowAnonymous]
+
+        [Authorize(Roles = AppConsts.AdminRole)]
         public async Task<IActionResult> Index()
         {
-            return View(await db.Templates.Include(x=>x.Topic).Select(x=>new TemplateVM() { Template = x }).ToListAsync());
+            var templates = await templateService.GetAllTemplatesAsync(includeTopic: true, includeAuthor: true);
+            return View(templates.Select(x=>new TemplateVM()
+            {
+                Template=x
+            }).ToList());
         }
 
+        [TypeFilter(typeof(TemplateAccessFilter))]
         public async Task<IActionResult> Statistics(int templateId)
         {
-            var template = await  db.Templates.Include(x => x.Questions).ThenInclude(x => x.FormAnswers)
-                .Include(x => x.Forms)
-                .FirstOrDefaultAsync(x=>x.Id==templateId);       
-
-
-            if (template is null)
-            {
-                return NotFound();
-            }
-            List<QuestionStatisticsVM> questionStatistics = new();
-            foreach (var question in template.Questions)
-            {
-                if (question.Type==QuestionType.Numeric)
-                {
-                    var result= question.FormAnswers.Select(x => double.TryParse(x.AnswerText, out double answer) ? answer : (double?)null)
-                        .Where(x=>x.HasValue).ToList();
-                    questionStatistics.Add(new QuestionStatisticsVM()
-                    {
-                        QuestionId = question.Id,
-                        QuestionText = question.Text,
-                        Type = question.Type,
-                        AverageValue = result.Any() ? result.Average() : null
-                    });
-                }
-                else
-                {
-                    var mostFrequent= question.FormAnswers.GroupBy(x => x.AnswerText).OrderByDescending(g => g.Count())
-                        .FirstOrDefault();
-                    questionStatistics.Add(new QuestionStatisticsVM()
-                    {
-                        QuestionText = question.Text,
-                        QuestionId = question.Id,
-                        Type = question.Type,
-                        MostFrequentAnswer=mostFrequent?.Key,
-                        Frequency = mostFrequent?.Count() ?? 0,
-                        OptionFrequencies = question.FormAnswers
-                            .GroupBy(a => a.AnswerText).Take(5)
-                            .ToDictionary(g => g.Key, g => g.Count())
-                    });
-                }
-            }
-
-            return View(questionStatistics);
+            var templateStatisticsVM = await templateService.GetTemplateStatisticsAsync(templateId);
+            return View(templateStatisticsVM);
         }
 
+        [TypeFilter(typeof(TemplateAccessFilter))]
         public async Task<IActionResult> Forms(int templateId)
         {
-            var template =await db.Templates.Include(x=>x.Forms).ThenInclude(x=>x.ApplicationUser)
-                .FirstOrDefaultAsync(x => x.Id == templateId);
+            var template= await templateService.GetTemplateAsync(x => x.Id == templateId,includeFormsAndUser:true);
+           
             if (template is null)
             {
                 return NotFound();
@@ -91,9 +60,11 @@ namespace MyForms.Controllers
         public async Task<IActionResult> Remove(IEnumerable<TemplateVM> templateVMs)
         {
             var templatesToRemove = templateVMs.Where(x => x.IsChecked).Select(x => x.Template.Id).ToList();          
-            await db.Templates.Where(x => templatesToRemove.Contains(x.Id)).ExecuteDeleteAsync();
-            return RedirectToAction(nameof(Index));
+            await templateService.RemoveTemplatesAsync(templatesToRemove);
+            return RedirectToAction("Index", "Home");
+
         }
+
         public async Task<IActionResult> Create()
         {
             var templateVm = new TemplateCreateVM()
@@ -121,75 +92,31 @@ namespace MyForms.Controllers
                 };
                 return View(templateCreateVM);
             }
-            Template template = templateCreateVM.Template;
             string userId= User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            template.CreatedById = userId;
-            await db.Templates.AddAsync(template);
-            await db.SaveChangesAsync();
-            if (templateCreateVM.Questions.Any())
-            {
-                await templateService.AddQuestions(templateCreateVM.Questions, template.Id);
-            }
-            if (template.IsPrivate && templateCreateVM.Emails.Any())
-            {               
-                await templateService.AssignUserAccessAsync(templateCreateVM.Emails, template.Id);
-            }
-            if (templateCreateVM.TagNames.Any())
-            {
-                await templateService.AssignTagsAsync(templateCreateVM.TagNames, template.Id);
-            }
-            if (templateCreateVM.Template.Image is not null)
-            {
-               template.ImageUrl= await templateService.UploadImageAsync(templateCreateVM.Template.Image);
-                await db.SaveChangesAsync();
+            await templateService.CreateAsync(templateCreateVM, userId);
+            return RedirectToAction("Index", "Home");
 
-            }
-            return RedirectToAction(nameof(Index));
         }
 
         [AllowAnonymous]
+        [TypeFilter(typeof(TemplateAccessFilter))]
         public async Task<IActionResult> Details(int templateId)
         {
-            var template = await db.Templates.Include(x => x.Topic)
-                .Include(x => x.ApplicationUser)
-                .Include(x => x.Questions).ThenInclude(x => x.AnswerOptions)
-                .Include(x => x.TemplateTags).ThenInclude(x => x.Tag)
-                .FirstOrDefaultAsync(x=>x.Id==templateId);
-            if (template is null)
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var templateVM = await templateService.GetTemplateDetailsAsync(templateId, userId);
+            if (templateVM is null)
             {
                 return NotFound();
             }
-            TemplateDetailsVM templateVM = new()
-            {
-                Template = template,
-                LikeVM = new()
-                {
-                    TemplateId = template.Id,
-                    LikesCount = await db.Likes.Where(x => x.TemplateId == templateId).CountAsync()
-                },
-                CommentsVM = new()
-                {
-                    TemplateId = template.Id,
-                    Comments = await db.Comments.Where(x => x.TemplateId == templateId).ToListAsync()
-                }
-            };
-            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId != null &&  await db.Likes.FirstOrDefaultAsync(x => x.UserId == userId && x.TemplateId==templateId) is not null)
-            {
-                templateVM.LikeVM.IsLiked= true;
-            }            
-            if (userId != null && userId==template.CreatedById)
-            {
-                templateVM.IsOwner = true;
-            }
             return View(templateVM);
         }
+
         [TypeFilter(typeof(OwnerOrAdminFilter))]
+        [TypeFilter(typeof(TemplateAccessFilter))]
         public async Task<IActionResult> Update(int templateId)
         {
-            var template = await db.Templates.Include(x => x.TemplateUsers).ThenInclude(x => x.ApplicationUser)
-                .Include(x=>x.TemplateTags).ThenInclude(x=>x.Tag)
-                .FirstOrDefaultAsync(x => x.Id == templateId);                
+            var template = await templateService.GetTemplateAsync(x => x.Id == templateId,
+                includeTemplateTagsAndTag: true, includeTemplateUsersAndUser: true);                
             if (template is null)
             {
                 return NotFound();
@@ -206,6 +133,8 @@ namespace MyForms.Controllers
         }
 
         [HttpPost]
+        [TypeFilter(typeof(OwnerOrAdminFilter))]
+        [TypeFilter(typeof(TemplateAccessFilter))]
         public async Task<IActionResult> Update(TemplateUpdateVM updateVM)
         {
             if (!ModelState.IsValid)
@@ -220,19 +149,23 @@ namespace MyForms.Controllers
             }
             return RedirectToAction(nameof(Details),new {templateId=updateVM.Template.Id});
         }
+
         [TypeFilter(typeof(OwnerOrAdminFilter))]
+        [TypeFilter(typeof(TemplateAccessFilter))]
         public async Task<IActionResult> QuestionsUpdate(int templateId)
         {
-            var questions = await db.Questions.Include(x => x.AnswerOptions).Where(x => x.TemplateId == templateId).ToListAsync();
+            var questions = await templateService.GetQuestionsAsync(x => x.TemplateId == templateId,includeAnswerOptions:true);
             TemplateQuestionUpdateVM questionUpdateVM = new()
             {
                 TemplateId = templateId,
-                Questions = questions
+                Questions = questions.OrderBy(x=>x.OrderIndex).ToList()
             };
             return View(questionUpdateVM);
         }
 
         [HttpPost]
+        [TypeFilter(typeof(OwnerOrAdminFilter))]
+        [TypeFilter(typeof(TemplateAccessFilter))]
         public async Task<IActionResult> QuestionsUpdate(TemplateQuestionUpdateVM questionUpdateVM)
         {
             if (!ModelState.IsValid)

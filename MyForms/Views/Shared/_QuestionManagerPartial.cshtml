@@ -1,6 +1,7 @@
 ﻿@model IList<Question>
+@inject IStringLocalizer<SharedResource> SharedLocalizer
 <div class="card border-0 my-4">
-    <div class="card-header border-bottom sticky-top py-2 bg-dark shadow-sm">
+    <div class="card-header border-bottom sticky-top py-2 bg-dark-subtle shadow-sm">
         <div class="row justify-content-center g-2">
             <div class=" col-auto">
                 <button id="delete-question" class="btn btn-outline-danger">
@@ -14,7 +15,7 @@
             </div>
             <div class=" col-auto">
                 <button id="select-all" class="btn btn-outline-primary">
-                    Select All <i class="bi bi-check2-all"></i>
+                    @SharedLocalizer["SelectAll"] <i class="bi bi - check2 - all"></i>
                 </button>
             </div>
         </div>
@@ -27,6 +28,8 @@
                     <div data-id="@i" class="question-item border border-secondary border-3  p-3 rounded-3 my-3">
                         <input name="Questions[@i].TemplateId" asp-for="@Model[i].TemplateId" hidden />
                         <input name="Questions[@i].Id" asp-for="@Model[i].Id" hidden />
+                        <input name="Questions[@i].OrderIndex" type="hidden" asp-for="@Model[i].OrderIndex" class="order-index" />
+
                         <div class="text-start col-1 check-wrap">
                             <input type="checkbox" class="form-check-input border-2 border-primary-subtle " />
                         </div>
@@ -35,7 +38,7 @@
                                 <div class="form-floating">
                                     <input name="Questions[@i].Text" placeholder="" asp-for="@Model[i].Text"
                                     class="form-control border-primary border-2  " />
-                                    <label class="text-muted fw-medium">Question Text</label>
+                                    <label class="text-muted fw-medium">@SharedLocalizer["QuestionText"]</label>
                                 </div>
                             </div>
                             <div class="col-md-6 ">
@@ -47,11 +50,11 @@
                         <div class="row  mt-3 ">
                             <div class="col-md-4">
                                 <div class="form-check form-switch">
-                                    <label class="form-check-label fw-medium">Add Description</label>
+                                    <label class="form-check-label fw-medium">@SharedLocalizer["AddDescription"]</label>
                                     <input type="checkbox" @(Model[i].Description ==null?"":"checked") class="form-check-input description-check">
                                 </div>
                                 <div class="form-check form-switch">
-                                    <label class="form-check-label fw-medium">Show in table</label>
+                                    <label class="form-check-label fw-medium">@SharedLocalizer["ShowInTable"]</label>
                                     <input name="Questions[@i].ShowInTable" asp-for="@Model[i].ShowInTable" value="true" type="checkbox" class="form-check-input">
                                 </div>
                             </div>
@@ -68,20 +71,20 @@
                                 @switch(Model[i].Type)
                                 {
                                     case QuestionType.MultiLineText:
-                                    <label class="form-label fw-semibold">Answer</label>
+                                        <label class="form-label fw-semibold">@SharedLocalizer["Answer"]</label>
                                     <textarea class="form-control" rows="3" disabled></textarea>
                                     break;
 
                                     case QuestionType.SingleLineText:
-                                        <label class="form-label fw-semibold">Answer</label>
+                                        <label class="form-label fw-semibold">@SharedLocalizer["Answer"]</label>
                                         <input type="text" class="form-control" disabled/>
                                         break;
                                     case QuestionType.Numeric:
-                                        <label class="form-label fw-semibold">Answer</label>
+                                        <label class="form-label fw-semibold">@SharedLocalizer["Answer"]</label>
                                         <input type="number" class="form-control" disabled />
                                         break;
                                     case QuestionType.Checkbox:
-                                        <label class="form-label fw-semibold">Options</label>
+                                        <label class="form-label fw-semibold">@SharedLocalizer["Options"]</label>
                                         <div class="checkboxes-container mb-2">
                                            @for (int j = 0; j < Model[i].AnswerOptions.Count; j++)
                                             {
@@ -108,6 +111,7 @@
             }
             <template id="question-template">
                 <div class="question-item border border-secondary border-3  p-3 rounded-3 my-3">
+                    <input name="Questions[{{index}}].OrderIndex" value="{{index}}" type="hidden" class="order-index"  />
                     <div class="text-start check-wrap">
                         <input type="checkbox" class="form-check-input border-2 border-primary-subtle " />
                     </div>
@@ -116,7 +120,7 @@
                             <div class="form-floating">
                                 <input placeholder="" name="Questions[{{index}}].Text"
                                        class="form-control border-primary border-2  " />
-                                <label class="text-muted fw-medium">Question Text</label>
+                                <label class="text-muted fw-medium">@SharedLocalizer["QuestionText"]</label>
                             </div>
                         </div>
                         <div class="col-md-6 ">
@@ -128,11 +132,11 @@
                     <div class="row  mt-3 ">
                         <div class="col-md-4">
                             <div class="form-check form-switch">
-                                <label class="form-check-label fw-medium">Add Description</label>
+                                <label class="form-check-label fw-medium">@SharedLocalizer["AddDescription"]</label>
                                 <input type="checkbox" class="form-check-input description-check">
                             </div>
                             <div class="form-check form-switch">
-                                <label class="form-check-label fw-medium">Show in table</label>
+                                <label class="form-check-label fw-medium">@SharedLocalizer["ShowInTable"]</label>
                                 <input name="Questions[{{index}}].ShowInTable" value="true" type="checkbox" class="form-check-input">
                             </div>
                         </div>

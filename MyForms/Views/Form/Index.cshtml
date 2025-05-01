@@ -1,4 +1,8 @@
-﻿@model IList<FormVM>
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.Extensions.Localization
+@model IList<FormVM>
+@inject IStringLocalizer<SharedResource> SharedLocalizer
+
 
 <form method="post">
     <div class="p-4">
@@ -6,7 +10,7 @@
         @if (Model != null && Model.Count() > 0)
         {
             <div class="row">
-                <h1 class="text-primary">Forms List</h1>
+                <h1 class="text-primary">@SharedLocalizer["FormList"]</h1>
             </div>
             <div class="m-2">
                 <button type="submit" asp-action="Remove" asp-controller="Form" class="btn btn-outline-danger">
@@ -18,13 +22,13 @@
                     <tr>
                         <th><input type="checkbox" class="form-check-input border-2 border-info" id="check-all" /></th>
                         <th>
-                            Template Title
+                            @SharedLocalizer["TemplateTitle"]
                         </th>
                         <th>
-                            Filled By
+                            @SharedLocalizer["FilledBy"]
                         </th>
                         <th>
-                            Data Created
+                            @SharedLocalizer["DataCreate"]
                         </th>
                     </tr>
                 </thead>
@@ -46,7 +50,7 @@
         }
         else
         {
-            <h1 class="text-primary">No forms</h1>
+            <h1 class="text-primary">@SharedLocalizer["ListEmpty"]</h1>
         }
     </div>
 

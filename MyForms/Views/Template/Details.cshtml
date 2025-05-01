@@ -1,4 +1,5 @@
 ﻿@using MyForms.Models.VM.TemplateVMs
+@inject IStringLocalizer<SharedResource> StringLocalizer
 @model TemplateDetailsVM
 @if (Model.IsOwner || User.IsInRole(AppConsts.AdminRole))
 {
@@ -10,13 +11,13 @@
             <h3>@Model.Template.Title</h3>
         </div>
         <div class="card-body">
-            <h6>Author: @Model.Template.ApplicationUser?.FullName</h6>
-            <p>Created At: @Model.Template.CreatedAt.ToShortDateString()</p>
+            <h6>@StringLocalizer["Author"]: @Model.Template.ApplicationUser?.FullName</h6>
+            <p>@StringLocalizer["CreatedAt"]: @Model.Template.CreatedAt.ToShortDateString()</p>
             <p>
-                Is Private: @Model.Template.IsPrivate
+                @StringLocalizer["IsPrivate"] : @Model.Template.IsPrivate
             </p>
             <div>
-                Topic: @Model.Template.Topic?.Name
+                @StringLocalizer["Topic"]: @Model.Template.Topic?.Name
             </div>
 
             <div class="d-flex gap-2 ">
@@ -35,7 +36,7 @@
     </div>
     <div class="card mt-4">
         <div class="card-header">
-            <h5>Questions</h5>
+            <h5>@StringLocalizer["Questions"]</h5>
         </div>
         <div class="card-body">
             @foreach (var question in Model.Template.Questions)
@@ -45,17 +46,10 @@
                     @if (question?.Description is not null)
                     {
                         <p class="text-muted small">@question?.Description</p>
-                    }
-                    <!-- Плейсхолдеры вместо полей ввода -->
+                    }                  
                     <div class=" p-2 rounded">
                         @switch (question?.Type)
                         {
-                            case QuestionType.SingleLineText:
-                                <small>[Текстовое поле]</small>
-                                break;
-                            case QuestionType.Numeric:
-                                <small>[Числовое поле]</small>
-                                break;
                             case QuestionType.Checkbox:
                                 @foreach (var answer in question.AnswerOptions)
                                 {
@@ -65,6 +59,10 @@
                                     </div>
                                 }
                                 break;
+                           default:
+                                <small>@StringLocalizer["Answer"]</small>
+                                break;
+                          
                         }
                     </div>
                 </div>
@@ -80,7 +78,7 @@
     @if (User.Identity.IsAuthenticated && !Model.IsOwner)
     {
         <div class="col-md-3 mx-auto my-4">
-            <a class="btn btn-primary w-100" asp-action="Create" asp-controller="Form" asp-route-templateId="@Model.Template.Id">Fill in</a>
+            <a class="btn btn-primary w-100" asp-action="Create" asp-controller="Form" asp-route-templateId="@Model.Template.Id">@StringLocalizer["Fill"]</a>
         </div>
     }
 

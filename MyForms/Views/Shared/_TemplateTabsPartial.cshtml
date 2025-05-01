@@ -1,23 +1,24 @@
 ﻿@model int
+@inject IStringLocalizer<SharedResource> StringLocalizer
 @{  
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 }
 <div class="my-3 col-md-8 mx-auto">
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link @(currentAction=="Details"?"active":"")" asp-action="Details" asp-controller="Template" asp-route-templateId="@Model"> Overview</a>
+            <a class="nav-link @(currentAction=="Details"?"active":"")" asp-action="Details" asp-controller="Template" asp-route-templateId="@Model"> @StringLocalizer["Overview"]</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link @(currentAction=="Update"?"active":"")" asp-action="Update" asp-controller="Template" asp-route-templateId="@Model">Edit</a>
+            <a class="nav-link @(currentAction=="Update"?"active":"")" asp-action="Update" asp-controller="Template" asp-route-templateId="@Model">@StringLocalizer["Edit"]</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link @(currentAction=="QuestionsUpdate"?"active":"")" asp-action="QuestionsUpdate" asp-controller="Template" asp-route-templateId="@Model">Questions</a>
+            <a class="nav-link @(currentAction=="QuestionsUpdate"?"active":"")" asp-action="QuestionsUpdate" asp-controller="Template" asp-route-templateId="@Model">@StringLocalizer["EditQuestions"]</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link @(currentAction == "Statistics" ? "active" : "")" asp-action="Statistics" asp-controller="Template" asp-route-templateId="@Model">Statistics</a>
+            <a class="nav-link @(currentAction == "Statistics" ? "active" : "")" asp-action="Statistics" asp-controller="Template" asp-route-templateId="@Model">@StringLocalizer["Statistics"]</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link @(currentAction=="Forms"?"active":"")" asp-action="Forms" asp-controller="Template" asp-route-templateId="@Model">Forms</a>
+            <a class="nav-link @(currentAction=="Forms"?"active":"")" asp-action="Forms" asp-controller="Template" asp-route-templateId="@Model">@StringLocalizer["Forms"]</a>
             </li>
         </ul>
 </div>

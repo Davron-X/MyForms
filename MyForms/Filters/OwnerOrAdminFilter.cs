@@ -16,7 +16,8 @@ namespace MyForms.Filters
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            int? templateId= context.ActionArguments["templateId"] as int? ;
+            context.ActionArguments.TryGetValue("templateId", out object? id);
+            var templateId = id as int?;
             if (templateId is null)
             {
                 context.Result = new ForbidResult();

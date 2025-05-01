@@ -6,7 +6,14 @@
     const selectAllBtn = document.getElementById("select-all");
     let questionCount = document.querySelectorAll(".question-item").length;
     let isCheck = true;
- 
+
+
+    new Sortable(questionContainer, {
+        animation: 150,
+        onEnd: async (evt) => {            
+            updateIndexes();
+        }
+    });
 
     createQuestionBtn.addEventListener("click", (e) => {
         e.preventDefault();
@@ -43,9 +50,11 @@
         const questions = questionContainer.querySelectorAll(".question-item");
         questions.forEach((question, index) => {
             question.querySelectorAll('[name^="Questions["]').forEach(item => {
-                item.name = item.name.replace(/\[\d+\]/g, `[${index}]`);
-                item.dataset.id = index;
+                item.name = item.name.replace(/Questions\[\d+\]/g, `Questions[${index}]`); 
             });
+            question.dataset.id = index
+            const orderindex = question.querySelector(".order-index");
+            orderindex.value = index;
         })
     }
     questionContainer.addEventListener("click", (e) => {
@@ -97,12 +106,7 @@
         const answerContainer = questionElement.querySelector(".answer-container");
         answerContainer.appendChild(createAnswerElement(questionType.value, questionIndex));       
     }
-    //questionType.addEventListener('input', (e) => {
-    //    const selectValue = e.target.value;
-    //    const answer = createAnswerElement(selectValue, questionIndex);
-    //    answerContainer.innerHTML = "";
-    //    answerContainer.appendChild(answer);
-    //});
+
     function toggleBorder(isChecked, questionItem) {
         if (isChecked) {
             questionItem.classList.add("border-warning");
@@ -124,29 +128,6 @@
         ChangeQuestionType(questionElement, questionCount++);
         questionContainer.appendChild(questionElement);
     }
-    //questionElement.addEventListener('click', (e) => {
-    //    if (e.target.classList.contains('question-item') || e.target.classList.contains('check-wrap')) {
-    //        const checkBox = questionElement.querySelector(".check-wrap input");
-    //        checkBox.checked = !checkBox.checked;
-    //        checkBox.dispatchEvent(new Event('change'));
-    //    }
-    //});
-
-    //questionElement.querySelector(".check-wrap input").addEventListener("change", (e) => {
-    //    if (e.target.checked) {
-    //        questionElement.classList.add("border-warning");
-    //        questionElement.classList.remove("border")
-    //        questionElement.classList.add("border-start");
-    //    }
-    //    else {
-    //        questionElement.classList.remove("border-warning")
-    //        questionElement.classList.add("border")
-    //        questionElement.classList.remove("border-start");
-    //    }
-    //});
-    //questionElement.querySelector(".description-check").addEventListener('change', () => {
-    //    questionElement.querySelector(".description-container").classList.toggle("d-none");
-    //});
     function reindexOptions(container) {
         container.querySelectorAll(`.option-container`).forEach((container, index) => {
             container.querySelectorAll(".option-input").forEach(input => {
@@ -154,7 +135,7 @@
             })           
         });
     }
-    //[name *= "AnswerOptions["]
+
     function createCheckBox(questionIndex, optIndex) {
         const checkBoxContainer = document.createElement("div");
         checkBoxContainer.className = "d-flex align-items-center gap-2  p-2 rounded option-container";
@@ -179,12 +160,6 @@
         checkBoxContainer.appendChild(closeBtn);
         return checkBoxContainer;
     }
-    //closeBtn.addEventListener('click', (e) => {
-    //    e.preventDefault();
-    //    const cntr = e.target.closest(".checkboxes-container");
-    //    e.target.closest('div').remove();
-    //    reindexOptions(cntr);
-    //});
 
     function createAnswerElement(type, questionIndex) {
         const container = document.createElement("div");
@@ -216,9 +191,4 @@
         }
         return container;
     }
-    //container.querySelector('.add-option').addEventListener('click', (e) => {
-    //    e.preventDefault();
-    //    const optionIndex = checkboxesContainer.querySelectorAll("div").length;
-    //    checkboxesContainer.appendChild(createCheckBox(questionIndex, optionIndex));
-    //});
 });

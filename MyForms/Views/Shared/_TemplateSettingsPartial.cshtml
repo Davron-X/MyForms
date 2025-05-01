@@ -1,29 +1,40 @@
 ﻿@using MyForms.Models.VM.TemplateVMs
+@inject IStringLocalizer<SharedResource> StringLocalizer 
 @model TemplateSettingVM
-<div class="card my-4">
+<div class="card my-4 ">
+
     <input hidden asp-for="Template.Id" id="template-id" />
     <div class="card-body">
-        <div asp-validation-summary="ModelOnly" class="text-danger col-md-8 mx-auto"></div>
-        <div class="form-floating my-3 col-md-8 mx-auto">
-            <input asp-for="Template.Title" placeholder="" class="form-control" />
-            <label asp-for="Template.Title"></label>
-            <span asp-validation-for="Template.Title" class="text-danger"></span>
-        </div>
-        <div class=" my-3 col-md-8 mx-auto">
-            <label asp-for="Template.Topic" class="form-label"></label>
-            <select class="form-select" asp-for="Template.TopicId" asp-items="Model.Topics">
-            </select>
-        </div>
+        <div class="col-md-8 mx-auto">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-floating my-3">
+                <input asp-for="Template.Title" placeholder="" class="form-control" />
+                <label asp-for="Template.Title"></label>
+                <span asp-validation-for="Template.Title" class="text-danger"></span>
+            </div>
+            <div class=" my-3">
+                <label asp-for="Template.Topic" class="form-label"></label>
+                <select class="form-select" asp-for="Template.TopicId" asp-items="Model.Topics">
+                </select>
+            </div>
 
-        <div class="form-floating my-3 col-md-8 mx-auto">
-            <textarea asp-for="Template.Description" placeholder="" class="form-control" rows="3" style="height:80px">                </textarea>
-            <label asp-for="Template.Description"></label>
-            <span asp-validation-for="Template.Description" class="text-danger"></span>
+            <div class="form-floating my-3">
+                <textarea asp-for="Template.Description" placeholder="" class="form-control" rows="3" style="height:80px">                </textarea>
+                <label asp-for="Template.Description"></label>
+                <span asp-validation-for="Template.Description" class="text-danger"></span>
+            </div>
+            <div class="my-3 ">
+                <label asp-for="Template.Image" class="form-label"></label>
+                <input asp-for="Template.Image" type="file" class="form-control">
+            </div>
+            @if (Model.Template is not null && Model.Template.ImageUrl is not null)
+            {
+                <div class="my-3 col-md-8 mx-auto">
+                    <img src="@Model.Template.ImageUrl"  class="img-fluid rounded-2" />
+                </div>
+            }
         </div>
-        <div class="my-3 col-md-8 mx-auto">
-            <label asp-for="Template.Image" class="form-label"></label>
-            <input asp-for="Template.Image" type="file" class="form-control">
-        </div>
+        
 
 
         <div class="my-3 col-md-8 mx-auto">
@@ -51,7 +62,7 @@
         </div>
 
         <div class="form-check my-3 col-md-8 mx-md-auto">
-            <label for="is-private-check">Is Private</label>
+            <label for="is-private-check">@StringLocalizer["IsPrivate"]</label>
             <input id="is-private-check" asp-for="Template.IsPrivate" class="form-check-input" />
         </div>
         <div id="add-email" @(Model.Template != null && Model.Template.IsPrivate ? "" : "hidden") class="my-3 col-md-8 mx-auto">

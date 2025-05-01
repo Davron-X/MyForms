@@ -1,5 +1,6 @@
 ﻿@using MyForms.Models.VM.TemplateVMs
 @model TemplateUpdateVM
+@inject IStringLocalizer<SharedResource> StringLocalizer
 <partial name="_TemplateTabsPartial" model="@Model.TemplateSettingVM.Template.Id" />
 
 <form method="post">
@@ -46,7 +47,7 @@
             </div>
         }
         <div class="my-4 col-md-3 mx-auto">
-            <input type="submit" value="Update" class="w-100 btn btn-primary" />
+            <input type="submit" value="@StringLocalizer["Update"]" class="w-100 btn btn-primary" />
         </div>
     </div>
     </div>

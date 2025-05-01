@@ -1,0 +1,53 @@
+﻿@using Humanizer
+@using MyForms.Controllers
+@model IEnumerable<TemplateSearchResult>
+
+@{
+    ViewData["Title"] = "Результаты поиска";
+}
+
+<div class="container mt-4">
+    <!-- Поисковая строка -->
+    <div class="row mb-4">
+        <div class="col-md-8 mx-auto">
+            <form asp-action="Search" asp-controller="Home" method="get" class="input-group">
+                <input type="text" name="query" class="form-control"
+                       placeholder="Введите запрос..." value="@ViewBag.Query">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Поиск
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Результаты -->
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            Ничего не найдено. Попробуйте изменить запрос.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="list-group">
+                    @foreach (var item in Model)
+                    {
+                        <a asp-controller="Template" asp-action="Details" asp-route-templateId="@item.Id"
+                           class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">@item.Title</h5>
+                                <small>ID: @item.Id</small>
+                            </div>
+                            <p class="mb-1 text-muted">@item.Snippet.Truncate(200)</p>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<script>
+
+</script>

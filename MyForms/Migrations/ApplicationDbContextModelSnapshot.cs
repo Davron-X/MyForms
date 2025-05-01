@@ -174,7 +174,7 @@ namespace MyForms.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("AnswerOptions");
+                    b.ToTable("AnswerOptions", (string)null);
                 });
 
             modelBuilder.Entity("MyForms.Models.ApplicationUser", b =>
@@ -274,7 +274,7 @@ namespace MyForms.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("MyForms.Models.Form", b =>
@@ -301,7 +301,7 @@ namespace MyForms.Migrations
 
                     b.HasIndex("TemplateId");
 
-                    b.ToTable("Forms");
+                    b.ToTable("Forms", (string)null);
                 });
 
             modelBuilder.Entity("MyForms.Models.FormAnswer", b =>
@@ -328,7 +328,7 @@ namespace MyForms.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("FormAnswers");
+                    b.ToTable("FormAnswers", (string)null);
                 });
 
             modelBuilder.Entity("MyForms.Models.Like", b =>
@@ -353,7 +353,7 @@ namespace MyForms.Migrations
                     b.HasIndex("TemplateId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("Likes");
+                    b.ToTable("Likes", (string)null);
                 });
 
             modelBuilder.Entity("MyForms.Models.Question", b =>
@@ -387,7 +387,7 @@ namespace MyForms.Migrations
 
                     b.HasIndex("TemplateId");
 
-                    b.ToTable("Questions");
+                    b.ToTable("Questions", (string)null);
                 });
 
             modelBuilder.Entity("MyForms.Models.Tag", b =>
@@ -404,7 +404,7 @@ namespace MyForms.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tags");
+                    b.ToTable("Tags", (string)null);
                 });
 
             modelBuilder.Entity("MyForms.Models.Template", b =>
@@ -444,7 +444,7 @@ namespace MyForms.Migrations
 
                     b.HasIndex("TopicId");
 
-                    b.ToTable("Templates");
+                    b.ToTable("Templates", (string)null);
                 });
 
             modelBuilder.Entity("MyForms.Models.TemplateTag", b =>
@@ -468,7 +468,7 @@ namespace MyForms.Migrations
                     b.HasIndex("TemplateId", "TagId")
                         .IsUnique();
 
-                    b.ToTable("TemplateTags");
+                    b.ToTable("TemplateTags", (string)null);
                 });
 
             modelBuilder.Entity("MyForms.Models.TemplateUserAccess", b =>
@@ -493,7 +493,7 @@ namespace MyForms.Migrations
                     b.HasIndex("TemplateId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("TemplateUserAccesses");
+                    b.ToTable("TemplateUserAccesses", (string)null);
                 });
 
             modelBuilder.Entity("MyForms.Models.Topic", b =>
@@ -510,7 +510,7 @@ namespace MyForms.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Topics");
+                    b.ToTable("Topics", (string)null);
 
                     b.HasData(
                         new

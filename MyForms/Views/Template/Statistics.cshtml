@@ -1,21 +1,23 @@
-﻿@model IEnumerable<QuestionStatisticsVM>
+﻿@model TemplateStatisticsVM
+@inject IStringLocalizer<SharedResource> StringLocalizer
+<partial name="_TemplateTabsPartial" model="Model.TemplateId" />
 <div class="card col-md-8 mx-auto">
     <div class="card-header text-center">
         <h2 class="text-primary">Statistics</h2>
     </div>
     <div class="card-body">
-        @foreach (var question in Model)
+        @foreach (var question in Model.QuestionStatistics)
         {
             <div>
                 <h5>@question.QuestionText</h5>
                 @if (question.Type == QuestionType.Numeric)
                 {
-                    <p>Average Value: @question.AverageValue</p>
+                    <p>@StringLocalizer["Average"]: @question.AverageValue</p>
                 }
                 else
                 {
-                    <p>Most Frequent answer: @question.MostFrequentAnswer, Frequency: @question.Frequency</p>
-                    <p>Other answers</p>
+                    <p>@StringLocalizer["FrequentAnswer"]: @question.MostFrequentAnswer, @StringLocalizer["Frequency"]: @question.Frequency</p>
+                    <p>@StringLocalizer["OtherAnswers"]</p>
                     <ul>
                         @foreach (var item in question.OptionFrequencies)
                         {

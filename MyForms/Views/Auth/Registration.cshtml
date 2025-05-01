@@ -1,9 +1,11 @@
 ﻿@model RegistrationDto
+@inject IStringLocalizer<SharedResource> SharedLocalizer
+
 <form method="post">
     <div class="card col-md-8 mx-auto mt-4">
         <div class="card-header bg-success bg-gradient">
             <div class="text-center">
-                <h2 class="text-white">Registration</h2>
+                <h2 class="text-white">@SharedLocalizer["Registration"]</h2>
             </div>
         </div>
         <div class=" card-body">
@@ -33,7 +35,7 @@
                 <label asp-for="IsRemeber"></label>
             </div>
             <div class="col-md-3 my-3 mx-auto">
-                <input type="submit" value="Register" class="btn btn-primary w-100" />
+                <input type="submit" value="@SharedLocalizer["Register"]" class="btn btn-primary w-100" />
             </div>
         </div>
     </div>

@@ -1,0 +1,83 @@
+﻿@model IList<TemplateVM>
+@inject IStringLocalizer<SharedResource> SharedLocalizer
+<form method="post">
+    <div class="p-4">
+        <div class="row">
+            <div class="col-md-3 offset-md-9 text-end">
+                <a class="btn btn-primary w-75" asp-action="Create" asp-controller="Template">@SharedLocalizer["CreateNew"]</a>
+            </div>
+        </div>
+        @if (Model != null && Model.Count() > 0)
+        {
+            <div class="row">
+                <h1 class="text-primary">@SharedLocalizer["MyTemplatesList"]</h1>
+            </div>
+            <div class="m-2">
+                <button type="submit" asp-action="Remove" asp-controller="Template" class="btn btn-outline-danger">
+                    <i class="bi bi-trash-fill"></i>
+                </button>
+            </div>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" class="form-check-input border-2 border-info" id="check-all" /></th>
+                        <th>
+                            @SharedLocalizer["Title"]
+                        </th>
+                        <th>
+                            @SharedLocalizer["Topic"]
+                        </th>
+                        <th>
+                            @SharedLocalizer["IsPrivate"]
+                        </th>
+                        <th>
+                            @SharedLocalizer["DataCreate"]
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        <tr class="clickable-row" data-href="@Url.Action("Details", "Template", new { templateId = Model[i].Template?.Id })">
+                            <td>
+                                <input type="checkbox" asp-for="@Model[i].IsChecked" class="form-check-input border-2 border-info" />
+                                <input asp-for="@Model[i].Template.Id" hidden />
+                            </td>
+                            <td>@Model[i].Template?.Title</td>
+                            <td>@Model[i].Template?.Topic?.Name</td>
+                            <td>@Model[i].Template?.IsPrivate</td>
+                            <td>@Model[i].Template?.CreatedAt</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <h1 class="text-primary">@SharedLocalizer["ListEmpty"]</h1>
+        }
+    </div>
+
+</form>
+
+<script>
+    const rows=document.querySelectorAll(".clickable-row");
+    rows.forEach(row=>{
+        row.style.cursor="pointer";
+        row.addEventListener("click",(e)=>{
+            if(e.target.nodeName!="INPUT"){
+                window.location=row.dataset.href;
+            }
+        });
+    });
+
+    const checkAll=document.getElementById("check-all");
+        checkAll.addEventListener("change",()=>
+        {
+            const checkBoxes=document.querySelectorAll(".clickable-row [type=checkbox]");
+            checkBoxes.forEach(checkBox=>{
+                checkBox.checked=checkAll.checked;
+            });
+    });
+
+</script>

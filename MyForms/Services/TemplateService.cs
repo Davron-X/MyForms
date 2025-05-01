@@ -8,13 +8,18 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc;
 using Imagekit.Sdk;
+using MyForms.Models.VM.TemplateVMs;
+using System.Linq.Expressions;
+using System.Security.Claims;
 
 namespace MyForms.Services
 {
     public class TemplateService : ITemplateService
     {
         private readonly ApplicationDbContext db;
+
         private readonly ImagekitClient imagekit;
+
         public TemplateService(ApplicationDbContext db, ImagekitClient imagekit)
         {
             this.db = db;
@@ -23,18 +28,14 @@ namespace MyForms.Services
 
         public async Task<string> UploadImageAsync(IFormFile file)
         {
-
-            // 2. Чтение файла в массив байтов
             await using var memoryStream = new MemoryStream();
             await file.CopyToAsync(memoryStream);
             var fileBytes = memoryStream.ToArray();
-
-            // 3. Загрузка через ImageKit
             var uploadResponse = await imagekit.UploadAsync(new FileCreateRequest
             {
                 file = Convert.ToBase64String(fileBytes),
                 fileName = Guid.NewGuid() + Path.GetExtension(file.FileName),
-                folder = "/templates" // Опционально
+                folder = "/templates" 
             });
 
             var imageUrl = uploadResponse.url;
@@ -132,7 +133,7 @@ namespace MyForms.Services
         }
         public async Task AddQuestions(IEnumerable<Question> questions, int templateId)
         {
-            questions = questions.Select(x =>
+            questions = questions.Select((x) =>
             {
                 x.TemplateId = templateId;
                 return x;
@@ -183,6 +184,183 @@ namespace MyForms.Services
             }
                 await db.SaveChangesAsync();
         }
+
+        public async Task<List<Template>> GetAllTemplatesAsync(Expression<Func<Template,bool>>? filter=null,bool includeTopic=false,bool includeAuthor=false)
+        {
+            var query=  db.Templates.AsQueryable();
+           
+            if (includeTopic)
+            {
+                query= query.Include(x=>x.Topic);                               
+            }
+            if (includeAuthor)
+            {
+                query = query.Include(x => x.ApplicationUser);
+            }
+            if (filter is not null)
+            {
+                 query =query.Where(filter);
+            }
+            return await query.ToListAsync() ;
+        }
+
+        public async Task<Template?> GetTemplateAsync(Expression<Func<Template, bool>>? filter = null, bool includeFormsAndUser=false
+            , bool includeTemplateUsersAndUser = false, bool includeTemplateTagsAndTag = false)
+        {
+            var query = db.Templates.AsQueryable();
+
+            if (includeFormsAndUser)
+            {
+                query =query.Include(x => x.Forms).ThenInclude(x => x.ApplicationUser);
+            }
+            if (includeTemplateUsersAndUser)
+            {
+                query = query.Include(x => x.TemplateUsers).ThenInclude(x => x.ApplicationUser);
+            }
+            if (includeTemplateTagsAndTag)
+            {
+                query = query.Include(x => x.TemplateTags).ThenInclude(x => x.Tag);
+            }
+         
+            if (filter is not null)
+            {
+                return await query.FirstOrDefaultAsync(filter);
+            }
+            
+            return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task RemoveTemplatesAsync(IEnumerable<int> templateIds)
+        {
+            await db.Templates.Where(x => templateIds.Contains(x.Id)).ExecuteDeleteAsync();
+        }
+
+        public async Task<List<Question>> GetQuestionsAsync(Expression<Func<Question, bool>>? filter = null, bool includeAnswerOptions = false)
+        {
+            var query=db.Questions.AsQueryable();
+            if (includeAnswerOptions)
+            {
+                query = query.Include(x => x.AnswerOptions);
+            }
+            if (filter is not null)
+            {
+               query= query.Where(filter);
+            }
+            return await query.ToListAsync();
+        }
+
+        public async Task<TemplateStatisticsVM?> GetTemplateStatisticsAsync(int templateId)
+        {
+            var template = await db.Templates.Include(x => x.Questions).ThenInclude(x => x.FormAnswers)
+           .Include(x => x.Forms)
+           .FirstOrDefaultAsync(x => x.Id == templateId);
+            if (template is null)
+            {
+                return null;
+            }
+            List<QuestionStatisticsVM> questionStatistics = new();
+            foreach (var question in template.Questions)
+            {
+                if (question.Type == QuestionType.Numeric)
+                {
+                    var result = question.FormAnswers.Select(x => double.TryParse(x.AnswerText, out double answer) ? answer : (double?)null)
+                        .Where(x => x.HasValue).ToList();
+                    questionStatistics.Add(new QuestionStatisticsVM()
+                    {
+                        QuestionId = question.Id,
+                        QuestionText = question.Text,
+                        Type = question.Type,
+                        AverageValue = result.Any() ? result.Average() : null
+                    });
+                }
+                else
+                {
+                    var mostFrequent = question.FormAnswers.GroupBy(x => x.AnswerText).OrderByDescending(g => g.Count())
+                        .FirstOrDefault();
+                    questionStatistics.Add(new QuestionStatisticsVM()
+                    {
+                        QuestionText = question.Text,
+                        QuestionId = question.Id,
+                        Type = question.Type,
+                        MostFrequentAnswer = mostFrequent?.Key,
+                        Frequency = mostFrequent?.Count() ?? 0,
+                        OptionFrequencies = question.FormAnswers
+                            .GroupBy(a => a.AnswerText).Take(5)
+                            .ToDictionary(g => g.Key, g => g.Count())
+                    });
+                }
+            }
+            TemplateStatisticsVM templateStatisticsVM = new()
+            {
+                TemplateId = template.Id,
+                QuestionStatistics = questionStatistics
+            };
+            return templateStatisticsVM;
+        }
+
+  
+
+        public async Task CreateAsync(TemplateCreateVM templateCreateVM,string userId)
+        {
+            Template template = templateCreateVM.Template;
+            template.CreatedById = userId;
+            await db.Templates.AddAsync(template);
+            await db.SaveChangesAsync();
+            if (templateCreateVM.Questions.Any())
+            {
+                await AddQuestions(templateCreateVM.Questions, template.Id);
+            }
+            if (template.IsPrivate && templateCreateVM.Emails.Any())
+            {
+                await AssignUserAccessAsync(templateCreateVM.Emails, template.Id);
+            }
+            if (templateCreateVM.TagNames.Any())
+            {
+                await AssignTagsAsync(templateCreateVM.TagNames, template.Id);
+            }
+            if (templateCreateVM.Template.Image is not null)
+            {
+                template.ImageUrl = await UploadImageAsync(templateCreateVM.Template.Image);
+                await db.SaveChangesAsync();
+            }
+        }
+
+        public async Task<TemplateDetailsVM?> GetTemplateDetailsAsync(int templateId,string userId)
+        {
+            var template = await db.Templates.Include(x => x.Topic)
+               .Include(x => x.ApplicationUser)
+               .Include(x => x.Questions).ThenInclude(x => x.AnswerOptions)
+               .Include(x => x.TemplateTags).ThenInclude(x => x.Tag)
+               .FirstOrDefaultAsync(x => x.Id == templateId);
+            if (template is null)
+            {
+                return null;
+            }
+            TemplateDetailsVM templateVM = new()
+            {
+                Template = template,
+                LikeVM = new()
+                {
+                    TemplateId = template.Id,
+                    LikesCount = await db.Likes.Where(x => x.TemplateId == templateId).CountAsync()
+                },
+                CommentsVM = new()
+                {
+                    TemplateId = template.Id,
+                    Comments = await db.Comments.Where(x => x.TemplateId == templateId).ToListAsync()
+                }
+            };
+            
+            if (userId != null && await db.Likes.FirstOrDefaultAsync(x => x.UserId == userId && x.TemplateId == templateId) is not null)
+            {
+                templateVM.LikeVM.IsLiked = true;
+            }
+            if (userId != null && userId == template.CreatedById)
+            {
+                templateVM.IsOwner = true;
+            }
+            return templateVM;
+        }
     }
     class AnswerOptionComparer : IEqualityComparer<AnswerOption>
     {
@@ -200,6 +378,7 @@ namespace MyForms.Services
             return obj.Id.GetHashCode();
         }
     }
+
     class QuestionComparer : IEqualityComparer<Question>
     {
         public bool Equals(Question? x, Question? y)

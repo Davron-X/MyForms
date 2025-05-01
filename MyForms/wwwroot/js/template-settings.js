@@ -26,12 +26,12 @@
         container.appendChild(tagWrap);
     }
     tagContainer.addEventListener('click', (e) => {
-        if (e.target.nodeName = "BUTTON") {
+        if (e.target.nodeName == "BUTTON") {
             e.target.closest("div").remove();
         }
     });
     emailContainer.addEventListener('click', (e) => {
-        if (e.target.nodeName = "BUTTON") {
+        if (e.target.nodeName == "BUTTON") {
             e.target.closest("div").remove();
         }
     });
@@ -86,11 +86,11 @@
     }
     function enableTypeHead(inputId, url) {
         $(`#${inputId}`).typeahead({
-            minLength: 1, // Начинаем поиск после ввода 1 буквы
-            highlight: true, // Подсвечиваем совпадения
+            minLength: 1, 
+            highlight: true, 
             source: function (query, process) {
                 return $.get(url, { query: query }, function (data) {
-                    return process(data); // Обновляем список вариантов
+                    return process(data); 
                 });
             }
         });

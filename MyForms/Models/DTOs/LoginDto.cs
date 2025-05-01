@@ -9,10 +9,11 @@ namespace MyForms.Models.DTOs
         public string Email { get; set; } = string.Empty;
 
         [Required]
-        [DataType(DataType.Password)]       
+        [DataType(DataType.Password)]
+        [Display(Name = "Password", ResourceType = typeof(MyForms.Resources.SharedResource))]
         public string Password { get; set; } = string.Empty;      
 
-        [Display(Name ="Remember me")]
+        [Display(Name ="RememberMe", ResourceType = typeof(MyForms.Resources.SharedResource))]
         public bool IsRemeber { get; set; }
     }
 }

@@ -8,6 +8,7 @@ namespace MyForms.Models
         [Key]
         public int Id { get; set; }
 
+        [Required(ErrorMessageResourceName = "RequiredQuestion", ErrorMessageResourceType =typeof(Resources.SharedResource))]
         public string AnswerText { get; set; } = string.Empty;
 
         public int FormId { get; set; }

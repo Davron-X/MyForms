@@ -17,6 +17,7 @@ namespace MyForms
             {
                 ApplicationUser admin = new()
                 {
+                    FullName="AdminAka",
                     Email = AppConsts.AdminEmail,
                     UserName = AppConsts.AdminEmail,
                     EmailConfirmed = true

@@ -1,13 +1,15 @@
-﻿@model IList<ApplicationUserVM>
+﻿@using Microsoft.Extensions.Localization
+@model IList<ApplicationUserVM>
+@inject IStringLocalizer<SharedResource> SharedLocalizer
 <form method="post">
     <div class="my-4">
         <div>
-            <h2 class="text-primary">User List</h2>
+            <h2 class="text-primary">@SharedLocalizer["UserList"]</h2>
         </div>
         <div class="row my-3">
             <div class="col-md-8 d-flex gap-3">
                 <button type="submit" asp-action="BlockUsers" class="btn btn-outline-warning">
-                    block
+                    @SharedLocalizer["Block"]
                     <i class="bi bi-lock-fill"></i>
                 </button>
                 <button type="submit" asp-action="UnblockUsers" class="btn btn-outline-primary">
@@ -17,11 +19,11 @@
                     <i class="bi bi-trash-fill"></i>
                 </button>
                 <button type="submit" asp-action="AddToAdmins" class="btn btn-outline-danger">
-                    Add to Admins
+                    @SharedLocalizer["AddToAdmins"]
                     <i class="bi bi-person-fill-up "></i>
                 </button>
                 <button type="submit" asp-action="RemoveAdminRoles" class="btn btn-outline-danger">
-                    Remove admin role
+                    @SharedLocalizer["RemoveAdminRole"]
                     <i class="bi bi-person-fill-down "></i>
                 </button>
             </div>
@@ -31,10 +33,10 @@
                 <thead>
                     <tr>
                         <th><input type="checkbox" class="form-check-input border-2 border-info" id="check-all" /></th>
-                        <th>Name</th>
+                        <th>@SharedLocalizer["Name"]</th>
                         <th>Email</th>
-                        <th>Roles</th>
-                        <th>Status</th>
+                        <th>@SharedLocalizer["Roles"]</th>
+                        <th>@SharedLocalizer["UserStatus"]</th>
                     </tr>
                 </thead>
                 <tbody>

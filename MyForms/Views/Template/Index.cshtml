@@ -1,15 +1,17 @@
-﻿@model IList<TemplateVM>
+﻿@using Microsoft.Extensions.Localization
+@model IList<TemplateVM>
+@inject IStringLocalizer<SharedResource> SharedLocalizer
 <form method="post">
     <div class="p-4">
         <div class="row">
             <div class="col-md-3 offset-md-9 text-end">
-                <a class="btn btn-primary w-75" asp-action="Create" asp-controller="Template">Create new</a>
+                <a class="btn btn-primary w-75" asp-action="Create" asp-controller="Template">@SharedLocalizer["CreateNew"]</a>
             </div>
         </div>
         @if (Model != null && Model.Count() > 0)
         {
             <div class="row">
-                <h1 class="text-primary">Templates List</h1>
+                <h1 class="text-primary">@SharedLocalizer["TemplateList"]</h1>
             </div>
             <div class="m-2">
                 <button type="submit" asp-action="Remove" asp-controller="Template" class="btn btn-outline-danger">
@@ -21,16 +23,20 @@
                     <tr>
                         <th><input type="checkbox" class="form-check-input border-2 border-info" id="check-all" /></th>
                         <th>
-                            Title
+                            @SharedLocalizer["Title"]
+                        </th>
+
+                        <th>
+                            @SharedLocalizer["Author"]
                         </th>
                         <th>
-                            Topic
+                            @SharedLocalizer["Topic"]
                         </th>
                         <th>
-                            Is Private
+                            @SharedLocalizer["IsPrivate"]
                         </th>
                         <th>
-                            Data Created
+                            @SharedLocalizer["DataCreate"]
                         </th>
                     </tr>
                 </thead>
@@ -40,9 +46,10 @@
                         <tr class="clickable-row" data-href="@Url.Action("Details", "Template", new { templateId = Model[i].Template?.Id })">
                             <td>
                                 <input type="checkbox" asp-for="@Model[i].IsChecked" class="form-check-input border-2 border-info" />
-                                <input asp-for="@Model[i].Template.Id" hidden />
+                                <input asp-for="@Model[i].Template!.Id" hidden />
                             </td>
                             <td>@Model[i].Template?.Title</td>
+                            <td>@Model[i].Template?.ApplicationUser?.FullName</td>
                             <td>@Model[i].Template?.Topic?.Name</td>
                             <td>@Model[i].Template?.IsPrivate</td>
                             <td>@Model[i].Template?.CreatedAt</td>
@@ -53,7 +60,7 @@
         }
         else
         {
-            <h1 class="text-primary">No templates</h1>
+            <h1 class="text-primary">@SharedLocalizer["ListEmpty"]</h1>
         }
     </div>
 

@@ -9,15 +9,25 @@ namespace MyForms.Models
     {
         [Key]
         public int Id { get; set; }
+
+        [Display(Name = "Title", ResourceType = typeof(MyForms.Resources.SharedResource))]
         public string Title { get; set; } = string.Empty;
+
+        [Display(Name = "Description", ResourceType = typeof(MyForms.Resources.SharedResource))]
         public string Description { get; set; } = string.Empty;
+
         public int TopicId { get; set; }
+
         [ForeignKey("TopicId")]
+        [Display(Name = "Topic", ResourceType = typeof(MyForms.Resources.SharedResource))]
         public Topic? Topic { get; set; }
+
         [NotMapped]
-        [Display(Name ="Upload Image")]
+        [Display(Name ="UploadImage",ResourceType = typeof(MyForms.Resources.SharedResource))]
         public IFormFile? Image { get; set; }
         public string? ImageUrl { get; set; }
+
+        [Display(Name = "IsPrivate", ResourceType = typeof(MyForms.Resources.SharedResource))]
         public bool IsPrivate { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string? CreatedById { get; set; } 

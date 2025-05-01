@@ -76,7 +76,10 @@ namespace MyForms.Controllers
 
             return LocalRedirect(returnUrl);
         }
-
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
         public async Task<IActionResult> LogOut()
         {
             await signInManager.SignOutAsync();
